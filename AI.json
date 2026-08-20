@@ -1,0 +1,776 @@
+{
+    "metadata": {
+        "name": "jpui-calendar",
+        "description": "A shadcn-styled inline calendar. Renders a month grid for picking a single date or a date range, with full keyboard navigation, min/max and per-date blocking, optional week numbers, multi-month display, and month/year dropdowns. Every visual token — cell size, radius, selected, today, range track, focus ring — is a separate editable style property. Dates are stored as timezone-safe `\"YYYY-MM-DD\"` strings.",
+        "keywords": [
+            "calendar",
+            "date picker",
+            "date range",
+            "datepicker",
+            "day picker",
+            "schedule",
+            "booking",
+            "form",
+            "shadcn"
+        ],
+        "features": [
+            "Single-date and date-range selection, stored as timezone-safe ISO date strings",
+            "Range mode with a live hover preview of the middle band and a continuous track across week boundaries",
+            "Min/max dates, individual blocked dates (hand-entered or mapped from a collection), and blocked weekdays",
+            "Minimum and maximum range length, enforced by greying out the days that would violate it",
+            "Full keyboard support: arrows, Home/End, PageUp/PageDown, Shift+PageUp/Down for years, Enter to select, Escape to cancel a pending range",
+            "Roving tab stop and a single focusable day, so Tab enters the grid at the selected date",
+            "Multi-month display, horizontal or vertical, with optional ISO or locale week numbers",
+            "Month and year dropdown captions for fast navigation across long spans",
+            "Localized month and weekday names from any BCP-47 tag, with no per-locale bundle cost",
+            "Around 47 style properties grouped into collapsible sections, defaulting to the shadcn light theme",
+            "Form integration with field naming, required and custom validation, and reset to the initial value"
+        ]
+    },
+    "properties": [
+        {
+            "name": "mode",
+            "description": "Selection mode. `\"single\"` stores one date string, `\"range\"` stores `{ start, end }`. Switching mode keeps the date — a range collapses to its start.",
+            "type": "string",
+            "defaultValue": "single"
+        },
+        {
+            "name": "initialValue",
+            "description": "The value the calendar opens on, and the value a form reset restores. Accepts `\"2026-08-14\"`, an ISO datetime, a timestamp, a Date, or — in range mode — `{ start, end }`, `{ from, to }` or `[start, end]`.",
+            "type": "string",
+            "defaultValue": ""
+        },
+        {
+            "name": "defaultMonth",
+            "description": "The month shown on first render. Empty opens on the selected value, or on the current month.",
+            "type": "string",
+            "defaultValue": ""
+        },
+        {
+            "name": "numberOfMonths",
+            "description": "How many consecutive months to render side by side, 1 to 12.",
+            "type": "number",
+            "defaultValue": 1
+        },
+        {
+            "name": "monthDirection",
+            "description": "Whether multiple months stack horizontally (`\"row\"`) or vertically (`\"column\"`). Only shown when more than one month is displayed.",
+            "type": "string",
+            "defaultValue": "row",
+            "inactiveProperty": {
+                "description": "Conditionally hidden — see the description."
+            }
+        },
+        {
+            "name": "minDate",
+            "description": "Earliest selectable date. Days before it are disabled and navigation stops at its month.",
+            "type": "string",
+            "defaultValue": ""
+        },
+        {
+            "name": "maxDate",
+            "description": "Latest selectable date. Days after it are disabled and navigation stops at its month.",
+            "type": "string",
+            "defaultValue": ""
+        },
+        {
+            "name": "disabledDates",
+            "description": "Individual dates to block. An array of date strings, or a bound collection mapped with Disabled date field.",
+            "type": "array",
+            "defaultValue": []
+        },
+        {
+            "name": "disabledDaysOfWeek",
+            "description": "Weekday indexes to block, 0 = Sunday. `[0, 6]` blocks every weekend.",
+            "type": "array",
+            "defaultValue": []
+        },
+        {
+            "name": "mappingDisabledDate",
+            "description": "Formula resolving the date of each item in Disabled dates. Runs once per item. Hidden until Disabled dates is bound.",
+            "type": "formula",
+            "defaultValue": {
+                "type": "f",
+                "code": "context.mapping?.['date']"
+            },
+            "inactiveProperty": {
+                "description": "Conditionally hidden — see the description."
+            }
+        },
+        {
+            "name": "minRange",
+            "description": "Minimum inclusive number of days in a range. While a start is pending, days that would close the range too short are greyed out. 0 = no minimum.",
+            "type": "number",
+            "defaultValue": 0,
+            "inactiveProperty": {
+                "description": "Conditionally hidden — see the description."
+            }
+        },
+        {
+            "name": "maxRange",
+            "description": "Maximum inclusive number of days in a range. While a start is pending, days beyond the limit are greyed out. 0 = no maximum.",
+            "type": "number",
+            "defaultValue": 0,
+            "inactiveProperty": {
+                "description": "Conditionally hidden — see the description."
+            }
+        },
+        {
+            "name": "captionLayout",
+            "description": "The month/year caption: a plain `\"label\"`, or native selects via `\"dropdown\"`, `\"dropdown-months\"`, `\"dropdown-years\"`.",
+            "type": "string",
+            "defaultValue": "label"
+        },
+        {
+            "name": "hideNavigation",
+            "description": "Remove the previous/next arrows. Keyboard navigation still moves between months.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "fromYear",
+            "description": "Earliest year offered by the year dropdown.",
+            "type": "number",
+            "defaultValue": 1970,
+            "inactiveProperty": {
+                "description": "Conditionally hidden — see the description."
+            }
+        },
+        {
+            "name": "toYear",
+            "description": "Latest year offered by the year dropdown. The list is capped at 400 entries.",
+            "type": "number",
+            "defaultValue": 2050,
+            "inactiveProperty": {
+                "description": "Conditionally hidden — see the description."
+            }
+        },
+        {
+            "name": "showOutsideDays",
+            "description": "Fill the leading and trailing cells with the neighbouring months’ days.",
+            "type": "boolean",
+            "defaultValue": true
+        },
+        {
+            "name": "fixedWeeks",
+            "description": "Always render 6 week rows so the calendar keeps a constant height while navigating.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "showWeekNumber",
+            "description": "Show a week-number column on the left of the grid.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "isoWeek",
+            "description": "Use ISO-8601 week numbering (weeks start Monday, week 1 contains the first Thursday).",
+            "type": "boolean",
+            "defaultValue": false,
+            "inactiveProperty": {
+                "description": "Conditionally hidden — see the description."
+            }
+        },
+        {
+            "name": "locale",
+            "description": "BCP-47 tag driving month and weekday names, e.g. `\"fr-FR\"`. Empty follows the browser. An unknown tag silently falls back rather than breaking the grid.",
+            "type": "string",
+            "defaultValue": "en-US"
+        },
+        {
+            "name": "weekStartsOn",
+            "description": "First column of the grid, `\"0\"` (Sunday) through `\"6\"` (Saturday).",
+            "type": "string",
+            "defaultValue": "0"
+        },
+        {
+            "name": "dateFormatStyle",
+            "description": "How the read-only `formatted` value in local context is rendered: `full | long | medium | short | iso | custom`. Does not affect the stored value. The presets go through `Intl` and follow the Locale property; only `custom` reaches date-fns.",
+            "type": "string",
+            "defaultValue": "medium"
+        },
+        {
+            "name": "customDateFormat",
+            "description": "A date-fns pattern used when Formatted value is `\"custom\"`. Month and day names in a custom pattern always render in English, because date-fns locale files are deliberately not bundled — use a preset if you need them localized.",
+            "type": "string",
+            "defaultValue": "dd/MM/yyyy",
+            "inactiveProperty": {
+                "description": "Conditionally hidden — see the description."
+            }
+        },
+        {
+            "name": "disabled",
+            "description": "Blocks selection and dims the calendar, adding the `disabled` state.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "readonly",
+            "description": "Blocks selection but keeps full opacity and keyboard focus, adding the `readonly` state.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "required",
+            "description": "Marks the field as required. A range counts as filled only once both ends are set.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "invalid",
+            "description": "Forces the `invalid` state. Bind it to a server-side error.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "ariaLabel",
+            "description": "Accessible name announced for the date grid.",
+            "type": "string",
+            "defaultValue": "Calendar"
+        },
+        {
+            "name": "fieldName",
+            "description": "The field name used in the form submission. Only shown inside a form.",
+            "type": "string",
+            "defaultValue": "",
+            "inactiveProperty": {
+                "description": "Conditionally hidden — see the description."
+            }
+        },
+        {
+            "name": "customValidation",
+            "description": "Enable a custom validation formula for this field. Only shown inside a form.",
+            "type": "boolean",
+            "defaultValue": false,
+            "inactiveProperty": {
+                "description": "Conditionally hidden — see the description."
+            }
+        },
+        {
+            "name": "validation",
+            "description": "Formula that must resolve truthy for the field to be valid. Only shown when Custom validation is on.",
+            "type": "formula",
+            "defaultValue": "",
+            "inactiveProperty": {
+                "description": "Conditionally hidden — see the description."
+            }
+        },
+        {
+            "name": "calendarBgColor",
+            "description": "Background of the whole calendar.",
+            "type": "string",
+            "defaultValue": "#FFFFFF"
+        },
+        {
+            "name": "calendarPadding",
+            "description": "Padding around the calendar contents.",
+            "type": "string",
+            "defaultValue": "12px"
+        },
+        {
+            "name": "calendarBorderAll",
+            "description": "CSS border shorthand on the calendar container.",
+            "type": "string",
+            "defaultValue": "none"
+        },
+        {
+            "name": "calendarBorderRadius",
+            "description": "Corner radius of the calendar container.",
+            "type": "string",
+            "defaultValue": "8px"
+        },
+        {
+            "name": "calendarFontFamily",
+            "description": "Font family for every text in the calendar.",
+            "type": "string",
+            "defaultValue": ""
+        },
+        {
+            "name": "monthGap",
+            "description": "Space between months when more than one is displayed.",
+            "type": "string",
+            "defaultValue": "16px",
+            "inactiveProperty": {
+                "description": "Conditionally hidden — see the description."
+            }
+        },
+        {
+            "name": "cellSize",
+            "description": "The exact square size of a day cell. Cells hold a 1:1 aspect ratio and do not grow with the container, so this also sets the calendar’s width: 7 × this value (8 × with week numbers), plus padding. Below that width the grid overflows rather than compressing.",
+            "type": "string",
+            "defaultValue": "32px"
+        },
+        {
+            "name": "cellRadius",
+            "description": "Corner radius of a day cell and its selection pill.",
+            "type": "string",
+            "defaultValue": "6px"
+        },
+        {
+            "name": "weekGap",
+            "description": "Vertical space between week rows.",
+            "type": "string",
+            "defaultValue": "4px"
+        },
+        {
+            "name": "captionFontSize",
+            "description": "Font size of the month/year caption.",
+            "type": "string",
+            "defaultValue": "14px"
+        },
+        {
+            "name": "captionFontWeight",
+            "description": "Font weight of the month/year caption.",
+            "type": "string",
+            "defaultValue": "500"
+        },
+        {
+            "name": "captionColor",
+            "description": "Text color of the month/year caption.",
+            "type": "string",
+            "defaultValue": "#0A0A0A"
+        },
+        {
+            "name": "navIconPrev",
+            "description": "Icon for the previous-month button. Empty uses the built-in chevron.",
+            "type": "string",
+            "defaultValue": null
+        },
+        {
+            "name": "navIconNext",
+            "description": "Icon for the next-month button. Empty uses the built-in chevron.",
+            "type": "string",
+            "defaultValue": null
+        },
+        {
+            "name": "navIconSize",
+            "description": "Size of the navigation icons.",
+            "type": "string",
+            "defaultValue": "16px"
+        },
+        {
+            "name": "navIconColor",
+            "description": "Color of the navigation icons.",
+            "type": "string",
+            "defaultValue": "#0A0A0A"
+        },
+        {
+            "name": "navBgColor",
+            "description": "Background of the navigation buttons.",
+            "type": "string",
+            "defaultValue": "transparent"
+        },
+        {
+            "name": "navHoverBgColor",
+            "description": "Background of the navigation buttons on hover.",
+            "type": "string",
+            "defaultValue": "#F5F5F5"
+        },
+        {
+            "name": "navHoverIconColor",
+            "description": "Icon color of the navigation buttons on hover.",
+            "type": "string",
+            "defaultValue": "#0A0A0A"
+        },
+        {
+            "name": "navBorderRadius",
+            "description": "Corner radius of the navigation buttons.",
+            "type": "string",
+            "defaultValue": "6px"
+        },
+        {
+            "name": "weekdayFontSize",
+            "description": "Font size of the weekday header row.",
+            "type": "string",
+            "defaultValue": "0.8rem"
+        },
+        {
+            "name": "weekdayFontWeight",
+            "description": "Font weight of the weekday header row.",
+            "type": "string",
+            "defaultValue": "400"
+        },
+        {
+            "name": "weekdayColor",
+            "description": "Text color of the weekday header row.",
+            "type": "string",
+            "defaultValue": "#737373"
+        },
+        {
+            "name": "dayFontSize",
+            "description": "Font size of a day number.",
+            "type": "string",
+            "defaultValue": "14px"
+        },
+        {
+            "name": "dayFontWeight",
+            "description": "Font weight of a day number.",
+            "type": "string",
+            "defaultValue": "400"
+        },
+        {
+            "name": "dayColor",
+            "description": "Text color of an unselected day.",
+            "type": "string",
+            "defaultValue": "#0A0A0A"
+        },
+        {
+            "name": "dayHoverBgColor",
+            "description": "Background of the day under the cursor. Today, selected and range days keep their own colors on hover.",
+            "type": "string",
+            "defaultValue": "#F5F5F5"
+        },
+        {
+            "name": "dayHoverColor",
+            "description": "Text color of the day under the cursor.",
+            "type": "string",
+            "defaultValue": "#0A0A0A"
+        },
+        {
+            "name": "selectedBgColor",
+            "description": "Background of the selected day in single mode.",
+            "type": "string",
+            "defaultValue": "#171717"
+        },
+        {
+            "name": "selectedColor",
+            "description": "Text color of the selected day in single mode.",
+            "type": "string",
+            "defaultValue": "#FAFAFA"
+        },
+        {
+            "name": "selectedHoverBgColor",
+            "description": "Background of the selected day on hover.",
+            "type": "string",
+            "defaultValue": "#171717"
+        },
+        {
+            "name": "todayBgColor",
+            "description": "Background of today’s cell.",
+            "type": "string",
+            "defaultValue": "#F5F5F5"
+        },
+        {
+            "name": "todayColor",
+            "description": "Text color of today’s cell.",
+            "type": "string",
+            "defaultValue": "#0A0A0A"
+        },
+        {
+            "name": "todayFontWeight",
+            "description": "Font weight of today’s cell.",
+            "type": "string",
+            "defaultValue": "500"
+        },
+        {
+            "name": "rangeEndpointBgColor",
+            "description": "Background of the range start and end pills.",
+            "type": "string",
+            "defaultValue": "#171717",
+            "inactiveProperty": {
+                "description": "Conditionally hidden — see the description."
+            }
+        },
+        {
+            "name": "rangeEndpointColor",
+            "description": "Text color of the range start and end pills.",
+            "type": "string",
+            "defaultValue": "#FAFAFA",
+            "inactiveProperty": {
+                "description": "Conditionally hidden — see the description."
+            }
+        },
+        {
+            "name": "rangeMiddleBgColor",
+            "description": "Background of the continuous track between the range endpoints.",
+            "type": "string",
+            "defaultValue": "#F5F5F5",
+            "inactiveProperty": {
+                "description": "Conditionally hidden — see the description."
+            }
+        },
+        {
+            "name": "rangeMiddleColor",
+            "description": "Text color of the days inside the range track.",
+            "type": "string",
+            "defaultValue": "#0A0A0A",
+            "inactiveProperty": {
+                "description": "Conditionally hidden — see the description."
+            }
+        },
+        {
+            "name": "outsideDayColor",
+            "description": "Text color of days belonging to the neighbouring months.",
+            "type": "string",
+            "defaultValue": "#A3A3A3"
+        },
+        {
+            "name": "disabledDayColor",
+            "description": "Text color of a disabled day.",
+            "type": "string",
+            "defaultValue": "#A3A3A3"
+        },
+        {
+            "name": "disabledDayOpacity",
+            "description": "Opacity of a disabled day, 0 to 1.",
+            "type": "number",
+            "defaultValue": 0.5
+        },
+        {
+            "name": "weekNumberColor",
+            "description": "Text color of the week-number column.",
+            "type": "string",
+            "defaultValue": "#737373",
+            "inactiveProperty": {
+                "description": "Conditionally hidden — see the description."
+            }
+        },
+        {
+            "name": "weekNumberFontSize",
+            "description": "Font size of the week-number column.",
+            "type": "string",
+            "defaultValue": "0.8rem",
+            "inactiveProperty": {
+                "description": "Conditionally hidden — see the description."
+            }
+        },
+        {
+            "name": "focusRingColor",
+            "description": "Color of the keyboard focus ring.",
+            "type": "string",
+            "defaultValue": "#A1A1A180"
+        },
+        {
+            "name": "focusRingWidth",
+            "description": "Width of the keyboard focus ring.",
+            "type": "string",
+            "defaultValue": "3px"
+        },
+        {
+            "name": "invalidBorderColor",
+            "description": "Border color of the calendar in the invalid state.",
+            "type": "string",
+            "defaultValue": "#DC2626"
+        },
+        {
+            "name": "invalidRingColor",
+            "description": "Ring color of the calendar in the invalid state.",
+            "type": "string",
+            "defaultValue": "#DC262633"
+        }
+    ],
+    "states": [
+        {
+            "name": "focus-visible",
+            "description": "A day button holds keyboard focus. Matched by `&:focus-visible, &:has(:focus-visible)` — the browser decides keyboard vs mouse, the component tracks nothing."
+        },
+        {
+            "name": "disabled",
+            "description": "Selection is blocked. Matched by `&[aria-disabled=\"true\"]` (and `&[data-ww-disabled=\"true\"]`, the editing-mode stand-in)."
+        },
+        {
+            "name": "readonly",
+            "description": "Selection is blocked but the calendar stays fully visible and focusable. Matched by `&[aria-readonly=\"true\"]`."
+        },
+        {
+            "name": "invalid",
+            "description": "The value failed validation, or the Invalid property forced it. Matched by `&[aria-invalid=\"true\"]`."
+        }
+    ],
+    "events": [
+        {
+            "name": "change",
+            "description": "The stored value changed, from a click, a keyboard selection or an action.",
+            "payload": {
+                "value": null
+            }
+        },
+        {
+            "name": "initValueChange",
+            "description": "The Initial value property changed and was written to the variable.",
+            "payload": {
+                "value": null
+            }
+        },
+        {
+            "name": "dayClick",
+            "description": "A selectable day was clicked or activated. Fires before the value updates.",
+            "payload": {
+                "value": "2026-08-14",
+                "date": "2026-08-14"
+            }
+        },
+        {
+            "name": "rangeComplete",
+            "description": "Both ends of a range are now set. Range mode only.",
+            "payload": {
+                "value": {
+                    "start": "2026-08-14",
+                    "end": "2026-08-20"
+                },
+                "dayCount": 7
+            }
+        },
+        {
+            "name": "monthChange",
+            "description": "The displayed month changed, from the arrows, the dropdowns, keyboard navigation or an action.",
+            "payload": {
+                "value": "2026-09-01"
+            }
+        },
+        {
+            "name": "focus",
+            "description": "Focus entered the calendar.",
+            "payload": null
+        },
+        {
+            "name": "blur",
+            "description": "Focus left the calendar.",
+            "payload": null
+        }
+    ],
+    "actions": [
+        {
+            "label": "Set value",
+            "actionName": "actionSetValue",
+            "description": "Write a value, normalised to the current mode.",
+            "args": [
+                {
+                    "name": "Value",
+                    "type": "any",
+                    "description": "A date string, Date, timestamp, or `{ start, end }` in range mode."
+                }
+            ]
+        },
+        {
+            "label": "Reset value",
+            "actionName": "actionResetValue",
+            "description": "Restore the Initial value and clear the interacted flag that drives required validation.",
+            "args": []
+        },
+        {
+            "label": "Clear value",
+            "actionName": "actionClear",
+            "description": "Empty the selection. In range mode both ends are cleared.",
+            "args": []
+        },
+        {
+            "label": "Go to month",
+            "actionName": "actionGoToMonth",
+            "description": "Display the month containing the given date. Does not change the selection.",
+            "args": [
+                {
+                    "name": "Month",
+                    "type": "string",
+                    "description": "Any date inside the target month, e.g. `\"2026-09-01\"`."
+                }
+            ]
+        },
+        {
+            "label": "Next month",
+            "actionName": "actionNextMonth",
+            "description": "Advance the displayed month by one, stopping at Max date.",
+            "args": []
+        },
+        {
+            "label": "Previous month",
+            "actionName": "actionPreviousMonth",
+            "description": "Go back one month, stopping at Min date.",
+            "args": []
+        },
+        {
+            "label": "Go to today",
+            "actionName": "actionGoToToday",
+            "description": "Display the current month. Does not select today.",
+            "args": []
+        },
+        {
+            "label": "Focus",
+            "actionName": "actionFocus",
+            "description": "Move keyboard focus to the active day button.",
+            "args": []
+        }
+    ],
+    "variables": [
+        {
+            "name": "value",
+            "description": "The selection. A `\"YYYY-MM-DD\"` string in single mode, `{ start, end }` in range mode. Either may be null.",
+            "type": "any",
+            "readonly": false
+        }
+    ],
+    "localContext": [
+        {
+            "path": "context.local.data?.['calendar']",
+            "type": "object",
+            "description": "Everything the calendar knows about its own state.",
+            "content": {
+                "value": {
+                    "type": "any",
+                    "description": "The stored selection, same as the `value` variable."
+                },
+                "mode": {
+                    "type": "string",
+                    "description": "`\"single\"` or `\"range\"`."
+                },
+                "formatted": {
+                    "type": "any",
+                    "description": "The selection rendered with the Formatted value setting. A string in single mode, `{ start, end }` in range mode."
+                },
+                "range": {
+                    "type": "object",
+                    "description": "`start`, `end`, `dayCount` (inclusive, 0 while open) and `isComplete`."
+                },
+                "displayedMonth": {
+                    "type": "string",
+                    "description": "First day of the month currently shown, as `\"YYYY-MM-01\"`."
+                },
+                "today": {
+                    "type": "string",
+                    "description": "Today as `\"YYYY-MM-DD\"`."
+                },
+                "utils": {
+                    "type": "object",
+                    "description": "`isEmpty`, `isInvalid`, `isDisabled`, `isReadonly`, `canGoPrevious`, `canGoNext`."
+                }
+            }
+        }
+    ],
+    "slots": [],
+    "specifications": [
+        "CRITICAL: states are selector-based, not emit-based. The component sets `aria-disabled` / `aria-readonly` / `aria-invalid` on its root and WeWeb generates the CSS from the selectors in `states`. There is no `add-state` / `remove-state` emission — do not add one.",
+        "CRITICAL: every style-panel property goes through the top-level `css()` hook, which emits one `--jpc-*` custom property per setting. The scoped SCSS reads them as `var(--jpc-x, <default>)`. Do not move these into an inline `:style` — the style compiler owns them, and an inline binding would ship only the base value and silently drop every per-state, per-breakpoint and per-class variant.",
+        "On the WeWeb canvas the day buttons drop their real `disabled` attribute (a disabled control suppresses the click the editor needs to select the element) and expose `data-ww-disabled` instead. In preview and in production the real attribute is back.",
+        "Day cells hold a 1:1 aspect ratio. It is set on the day `<button>`, never on the `<td>`: `aspect-ratio` does not apply to internal table boxes and is silently ignored there — verified in Chromium, where a `<td>` with `aspect-ratio: 1; width: 70px` measures 70 × 2.",
+        "The calendar sizes itself with `width: fit-content` — it hugs its grid rather than stretching, so a day cell is exactly Cell size at any container width. A width set in the style panel still overrides this.",
+        "It has a hard minimum width of 7 × Cell size (8 × with week numbers): `table-layout: fixed` will not shrink columns below their declared width. Below that floor the grid overflows its container. Lower Cell size for narrow layouts rather than expecting the calendar to compress.",
+        "CRITICAL: dates are stored as date-only strings (`\"2026-08-14\"`), never as Date objects or ISO timestamps. This is deliberate — a timestamp read back in another timezone lands on the wrong day. Compare and bind against the string.",
+        "CRITICAL: this is an inline calendar with no built-in popover. To build a date-picker dropdown, place it inside a WeWeb dropdown or dialog and drive that element from the `change` event.",
+        "In range mode the value is `{ start, end }`. `end` is null while the user is mid-selection, so guard on `range.isComplete` (or `end`) before using the range.",
+        "Clicking a day before the pending start restarts the range from that day. Escape cancels a pending range entirely.",
+        "Min/max range length is enforced visually: the days that would violate it are disabled while a start is pending, so a click on them does nothing.",
+        "Clicking the already-selected day in single mode clears it, unless Required is on.",
+        "Only Default month re-anchors the view. Writing to the value from a workflow deliberately does not scroll the grid — call the Go to month action if you want both.",
+        "The Locale property drives month and weekday names through the browser’s Intl, so any BCP-47 tag works without a bundle cost. A custom date format pattern, by contrast, renders its month and day names in English.",
+        "Multi-month display renders consecutive months from the anchor. Each month gets its own caption dropdowns; changing one shifts the whole anchor so the months stay consecutive.",
+        "The calendar has one tab stop. Tab enters at the focused day, else the selected day, else today, else the first day of the month; arrows move within and across months."
+    ],
+    "examples": [
+        {
+            "description": "A booking calendar: pick a stay of 2 to 14 nights, no dates in the past, weekends blocked.",
+            "example": "{\"mode\":\"range\",\"minDate\":\"2026-08-18\",\"minRange\":2,\"maxRange\":14,\"disabledDaysOfWeek\":[{\"day\":0},{\"day\":6}],\"numberOfMonths\":2,\"fixedWeeks\":true}"
+        },
+        {
+            "description": "A date of birth picker with month and year dropdowns.",
+            "example": "{\"mode\":\"single\",\"captionLayout\":\"dropdown\",\"fromYear\":1920,\"toYear\":2026,\"maxDate\":\"2026-08-18\",\"defaultMonth\":\"1990-01-01\",\"dateFormatStyle\":\"long\"}"
+        },
+        {
+            "description": "A compact European calendar with ISO week numbers.",
+            "example": "{\"mode\":\"single\",\"locale\":\"fr-FR\",\"weekStartsOn\":\"1\",\"showWeekNumber\":true,\"isoWeek\":true,\"cellSize\":\"28px\",\"dayFontSize\":\"13px\"}"
+        }
+    ],
+    "dependencies": [
+        "date-fns@4.1.0"
+    ]
+}
