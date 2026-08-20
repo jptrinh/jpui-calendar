@@ -944,16 +944,17 @@ context.local.data?.['calendar']?.['range']?.['dayCount']
 <style lang="scss" scoped>
 .jp-cal {
     box-sizing: border-box;
-    // shadcn's `w-fit`. The calendar hugs its grid instead of stretching, so a day cell
-    // is exactly --jpc-cell-size at any container width. This is only the default sizing
-    // mode — a width set in WeWeb's style panel still wins, which is why there is no
-    // `min-width: max-content` here: it would win back and pin the element above any
-    // width the user picked.
+    // The calendar hugs its grid instead of stretching, so a day cell is exactly
+    // --jpc-cell-size at any container width.
     //
-    // `fit-content` already clamps itself to the available space, so below the hard floor
-    // of 7 × --jpc-cell-size (8 × with week numbers) the box stops at the container while
-    // the grid keeps its size and overflows. `max-width: 100%` would be redundant.
-    width: fit-content;
+    // `max-content`, not `fit-content`. `fit-content` clamps itself to the available
+    // space, which made the box narrower than the table it contains — the grid then spilled
+    // out of its own background, and any fit-content ancestor sized itself to the shrunken
+    // box rather than to the visible calendar. `max-content` never clamps, so the box is
+    // always exactly the grid and parents measure the right thing. In a container narrower
+    // than 7 × --jpc-cell-size the whole element overflows as one block, background
+    // included, instead of coming apart.
+    width: max-content;
     // No background / padding / border / border-radius here: those belong to WeWeb's
     // element style panel, and declaring them from the component fought it.
     font-family: var(--jpc-font-family, inherit);

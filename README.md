@@ -40,18 +40,24 @@ all understood on the way in. Writing is not — the value you bind against is a
 
 ## Sizing
 
-The calendar is `width: fit-content` — it hugs its grid rather than stretching, so a day
+The calendar is `width: max-content` — it hugs its grid rather than stretching, so a day
 cell is exactly **Cell size** at any container width, and cells hold a 1:1 aspect ratio.
-A width set in WeWeb's style panel still overrides this.
 
-That gives it a hard minimum width of **7 × Cell size** (8 × with week numbers):
-`table-layout: fixed` will not shrink columns below their declared width, so below that
-floor the grid overflows its container instead of compressing. Lower Cell size for narrow
-layouts.
+Its width is therefore always **7 × Cell size** (8 × with week numbers): 224 px at the
+default Cell size of 32, 336 px at 48. Two months side by side come to 464 px. Any padding
+or border added from the element style panel sits outside those numbers. All measured in
+Chromium.
 
-Measured in Chromium at the defaults: 224 px wide, stable from a 240 px container up to
-800 px; two months side by side come to 464 px; at Cell size 48 it is 336 px. Any padding
-or border you add from the element style panel sits outside those numbers.
+`table-layout: fixed` will not shrink a column below its declared width, so the calendar
+never compresses. In a container narrower than that width the whole element overflows as
+one block, background included — it does not come apart. **Size the parent from the
+calendar, not the other way round:** give the container `fit-content` (Hug), or a fixed
+width of at least 7 × Cell size plus its own padding. Lower Cell size for narrow layouts.
+
+`max-content` rather than `fit-content` is deliberate. `fit-content` clamps itself to the
+available space, which made the element's box narrower than the table inside it: the grid
+spilled out of its own background, and a `fit-content` ancestor then sized itself to the
+shrunken box instead of to the visible calendar.
 
 ## Settings
 
