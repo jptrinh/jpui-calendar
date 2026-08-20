@@ -162,27 +162,10 @@ npm run build -- --name=jpui-calendar --type=wwobject
 Note the `--` before the build args. Without it npm swallows `--name` and the CLI stops early —
 while still exiting `0`, so read the output rather than trusting the exit code.
 
+Bump the version on every re-sync: the editor gates the installed build on it, so a component
+republished under the same version may not pick up changes.
+
 ## Dependencies
 
 `date-fns@4.1.0` for date arithmetic — the same version WeWeb's own date-time picker ships. Locale
 names deliberately go through `Intl` instead, so no `date-fns` locale files are bundled.
-
-## Status
-
-**v0.1.0 — built and unit-tested, not yet exercised in the WeWeb editor.**
-
-`npm run build` is clean and 161 headless checks pass across four suites: SSR render, selection
-and keyboard logic, a DOM pass under happy-dom, and a pass over the *editor* bundle (the one
-with the `wwEditor` blocks left in, where the canvas-selectability and state-preview behaviour
-lives). The layout numbers in **Sizing** were measured in Chromium.
-
-None of that is the same as running inside WeWeb. Two things in particular are unverified and
-worth checking first on a placed instance:
-
-- whether `bindable: true` style properties resolve through the style compiler — every style
-  property here is bindable, and WeWeb's published docs do not cover the `css()` hook at all;
-- how the four-column rows render, especially row 4, which mixes two `Text` inputs with two
-  expandable `Array` controls.
-
-Bump the version on every re-sync: the editor gates the installed build on it, so a component
-republished under the same version may not pick up changes.
