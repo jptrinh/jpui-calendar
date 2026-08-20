@@ -257,30 +257,6 @@
             }
         },
         {
-            "name": "calendarBgColor",
-            "description": "Background of the whole calendar.",
-            "type": "string",
-            "defaultValue": "#FFFFFF"
-        },
-        {
-            "name": "calendarPadding",
-            "description": "Padding around the calendar contents.",
-            "type": "string",
-            "defaultValue": "12px"
-        },
-        {
-            "name": "calendarBorderAll",
-            "description": "CSS border shorthand on the calendar container.",
-            "type": "string",
-            "defaultValue": "none"
-        },
-        {
-            "name": "calendarBorderRadius",
-            "description": "Corner radius of the calendar container.",
-            "type": "string",
-            "defaultValue": "8px"
-        },
-        {
             "name": "calendarFontFamily",
             "description": "Font family for every text in the calendar.",
             "type": "string",
@@ -743,6 +719,7 @@
         "CRITICAL: every style-panel property goes through the top-level `css()` hook, which emits one `--jpc-*` custom property per setting. The scoped SCSS reads them as `var(--jpc-x, <default>)`. Do not move these into an inline `:style` — the style compiler owns them, and an inline binding would ship only the base value and silently drop every per-state, per-breakpoint and per-class variant.",
         "On the WeWeb canvas the day buttons drop their real `disabled` attribute (a disabled control suppresses the click the editor needs to select the element) and expose `data-ww-disabled` instead. In preview and in production the real attribute is back.",
         "Day cells hold a 1:1 aspect ratio. It is set on the day `<button>`, never on the `<td>`: `aspect-ratio` does not apply to internal table boxes and is silently ignored there — verified in Chromium, where a `<td>` with `aspect-ratio: 1; width: 70px` measures 70 × 2.",
+        "CRITICAL: the calendar declares no background, padding, border or border-radius of its own. Those belong to WeWeb's element style panel on the root — a component-level duplicate put two competing sources on the same CSS properties. Style the box from the element panel, not from the Calendar group, which now only carries Font family and Month gap.",
         "The calendar sizes itself with `width: fit-content` — it hugs its grid rather than stretching, so a day cell is exactly Cell size at any container width. A width set in the style panel still overrides this.",
         "It has a hard minimum width of 7 × Cell size (8 × with week numbers): `table-layout: fixed` will not shrink columns below their declared width. Below that floor the grid overflows its container. Lower Cell size for narrow layouts rather than expecting the calendar to compress.",
         "CRITICAL: dates are stored as date-only strings (`\"2026-08-14\"`), never as Date objects or ISO timestamps. This is deliberate — a timestamp read back in another timezone lands on the wrong day. Compare and bind against the string.",

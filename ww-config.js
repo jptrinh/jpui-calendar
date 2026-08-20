@@ -53,14 +53,7 @@ export default {
             {
                 label: 'Calendar',
                 isCollapsible: true,
-                properties: [
-                    'calendarBgColor',
-                    'calendarPadding',
-                    'calendarBorderAll',
-                    'calendarBorderRadius',
-                    'calendarFontFamily',
-                    'monthGap',
-                ],
+                properties: ['calendarFontFamily', 'monthGap'],
             },
             {
                 label: 'Cell',
@@ -150,10 +143,9 @@ export default {
     css({ content }) {
         return [
             /* Calendar */
-            { property: '--jpc-bg', value: content.calendarBgColor },
-            { property: '--jpc-padding', value: content.calendarPadding },
-            { property: '--jpc-border', value: content.calendarBorderAll },
-            { property: '--jpc-radius', value: content.calendarBorderRadius },
+            // Background, padding, border and radius are deliberately absent: WeWeb's own
+            // element style panel already owns those on the root, and declaring them here
+            // put two competing sources on the same properties.
             { property: '--jpc-font-family', value: content.calendarFontFamily },
             { property: '--jpc-month-gap', value: content.monthGap },
             /* Cell */
@@ -821,78 +813,6 @@ export default {
         /* ══════════════════════════ STYLE ══════════════════════════ */
 
         /* ─── Calendar ─── */
-
-        calendarBgColor: {
-            label: { en: 'Background' },
-            type: 'Color',
-            section: 'style',
-            options: { nullable: true },
-            defaultValue: '#FFFFFF',
-            bindable: true,
-            responsive: true,
-            states: true,
-            classes: true,
-            /* wwEditor:start */
-            bindingValidation: { cssSupports: 'color', type: 'string', tooltip: 'A color: `"#FFFFFF" | "transparent"`' },
-            /* wwEditor:end */
-        },
-
-        calendarPadding: {
-            label: { en: 'Padding' },
-            type: 'Spacing',
-            section: 'style',
-            options: {
-                unitChoices: [
-                    { value: 'px', label: 'px', min: 0, max: 100 },
-                    { value: 'rem', label: 'rem', min: 0, max: 6 },
-                ],
-                noRange: true,
-                useVar: true,
-            },
-            defaultValue: '12px',
-            bindable: true,
-            responsive: true,
-            states: true,
-            classes: true,
-        },
-
-        calendarBorderAll: {
-            label: { en: 'Border' },
-            type: 'Border',
-            section: 'style',
-            defaultValue: 'none',
-            bindable: true,
-            responsive: true,
-            states: true,
-            classes: true,
-            /* wwEditor:start */
-            bindingValidation: {
-                cssSupports: 'border',
-                type: 'string',
-                tooltip: 'A CSS border shorthand: `"1px solid #E5E5E5"` | `"none"`',
-            },
-            /* wwEditor:end */
-        },
-
-        calendarBorderRadius: {
-            label: { en: 'Border radius' },
-            type: 'Spacing',
-            section: 'style',
-            options: {
-                unitChoices: [
-                    { value: 'px', label: 'px', min: 0, max: 100 },
-                    { value: '%', label: '%', min: 0, max: 50 },
-                ],
-                isCorner: true,
-                noRange: true,
-                useVar: true,
-            },
-            defaultValue: '8px',
-            bindable: true,
-            responsive: true,
-            states: true,
-            classes: true,
-        },
 
         calendarFontFamily: {
             label: { en: 'Font family' },

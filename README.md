@@ -44,13 +44,14 @@ The calendar is `width: fit-content` — it hugs its grid rather than stretching
 cell is exactly **Cell size** at any container width, and cells hold a 1:1 aspect ratio.
 A width set in WeWeb's style panel still overrides this.
 
-That gives it a hard minimum width of **7 × Cell size** (8 × with week numbers), plus
-padding: `table-layout: fixed` will not shrink columns below their declared width, so
-below that floor the grid overflows its container instead of compressing. Lower Cell size
-for narrow layouts.
+That gives it a hard minimum width of **7 × Cell size** (8 × with week numbers):
+`table-layout: fixed` will not shrink columns below their declared width, so below that
+floor the grid overflows its container instead of compressing. Lower Cell size for narrow
+layouts.
 
-Measured in Chromium at the defaults: 248 px wide (224 grid + 24 padding), stable from a
-240 px container up to 800 px; two months side by side come to 488 px.
+Measured in Chromium at the defaults: 224 px wide, stable from a 240 px container up to
+800 px; two months side by side come to 464 px; at Cell size 48 it is 336 px. Any padding
+or border you add from the element style panel sits outside those numbers.
 
 ## Settings
 
@@ -89,10 +90,14 @@ grid looks → language and formatting → state, accessibility, form. It mirror
 
 ## Styling
 
-Roughly 47 style properties, grouped into collapsible sections in the sidepanel:
+43 style properties, grouped into collapsible sections in the sidepanel:
 
 **Calendar** · **Cell** · **Caption & nav** · **Weekday header** · **Day** · **Selected** ·
 **Today** · **Range** · **Outside & disabled** · **Week number** · **Focus-visible** · **Invalid**
+
+The **Calendar** group is deliberately thin — just Font family and Month gap. Background,
+padding, border and border-radius belong to WeWeb's own element style panel on the root;
+declaring them from the component too put two competing sources on the same properties.
 
 Every one of them is bindable, responsive and state-aware. They are declared through the
 top-level `css()` hook in `ww-config.js`, which hands them to WeWeb's style compiler as

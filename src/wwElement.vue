@@ -954,10 +954,8 @@ context.local.data?.['calendar']?.['range']?.['dayCount']
     // of 7 × --jpc-cell-size (8 × with week numbers) the box stops at the container while
     // the grid keeps its size and overflows. `max-width: 100%` would be redundant.
     width: fit-content;
-    background: var(--jpc-bg, #FFFFFF);
-    padding: var(--jpc-padding, 12px);
-    border: var(--jpc-border, none);
-    border-radius: var(--jpc-radius, 8px);
+    // No background / padding / border / border-radius here: those belong to WeWeb's
+    // element style panel, and declaring them from the component fought it.
     font-family: var(--jpc-font-family, inherit);
     color: var(--jpc-day-color, #0A0A0A);
     -webkit-font-smoothing: antialiased;
@@ -973,6 +971,8 @@ context.local.data?.['calendar']?.['range']?.['dayCount']
     }
 
     &[aria-invalid='true'] {
+        // Recolours whatever border the element panel set. With no border there, the
+        // ring below is what carries the state.
         border-color: var(--jpc-invalid-border, #DC2626);
         box-shadow: 0 0 0 3px var(--jpc-invalid-ring, #DC262633);
     }
