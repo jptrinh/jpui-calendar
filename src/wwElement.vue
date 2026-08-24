@@ -18,7 +18,14 @@
         @mouseleave="hoveredKey = null"
     >
         <div class="jp-cal__months" :class="{ 'is-column': resolvedMonthDirection === 'column' }">
-            <div v-for="(month, monthIndex) in months" :key="month.key" class="jp-cal__month">
+            <!--
+                Keyed by position, not by month key. A date key would destroy and rebuild the
+                whole month — nav button included — on every month change, and Vue flushes that
+                patch between the button's own click handler and any document-level one. A
+                closing dropdown (ww-dropdown resolves `event.target.closest('[data-dropdown-uid]')`
+                at that point) would then see a detached target and treat the click as outside.
+            -->
+            <div v-for="(month, monthIndex) in months" :key="monthIndex" class="jp-cal__month">
                 <div class="jp-cal__caption">
                     <button
                         v-if="showNavigation && monthIndex === 0"
