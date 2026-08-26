@@ -1,3 +1,20 @@
+// The exact option list WeWeb's own components use for a font weight (ww-rich-text,
+// ww-button-multilang, ww-input-otp and others): numeric values across the full 100–900
+// range, a null "Default" that falls through to the SCSS fallback, and "<number> - <Name>"
+// labels. Shared rather than repeated so the four weight properties cannot drift apart.
+const FONT_WEIGHT_OPTIONS = [
+    { value: null, label: { en: 'Default' } },
+    { value: 100, label: { en: '100 - Thin' } },
+    { value: 200, label: { en: '200 - Extra Light' } },
+    { value: 300, label: { en: '300 - Light' } },
+    { value: 400, label: { en: '400 - Normal' } },
+    { value: 500, label: { en: '500 - Medium' } },
+    { value: 600, label: { en: '600 - Semi Bold' } },
+    { value: 700, label: { en: '700 - Bold' } },
+    { value: 800, label: { en: '800 - Extra Bold' } },
+    { value: 900, label: { en: '900 - Black' } },
+];
+
 export default {
     editor: {
         label: { en: 'Calendar' },
@@ -993,15 +1010,8 @@ export default {
             label: { en: 'Caption weight' },
             type: 'TextSelect',
             section: 'style',
-            options: {
-                options: [
-                    { value: '400', label: 'Regular' },
-                    { value: '500', label: 'Medium' },
-                    { value: '600', label: 'Semibold' },
-                    { value: '700', label: 'Bold' },
-                ],
-            },
-            defaultValue: '500',
+            options: { options: FONT_WEIGHT_OPTIONS },
+            defaultValue: 500,
             bindable: true,
             responsive: true,
             states: true,
@@ -1174,15 +1184,8 @@ export default {
             label: { en: 'Weekday weight' },
             type: 'TextSelect',
             section: 'style',
-            options: {
-                options: [
-                    { value: '400', label: 'Regular' },
-                    { value: '500', label: 'Medium' },
-                    { value: '600', label: 'Semibold' },
-                    { value: '700', label: 'Bold' },
-                ],
-            },
-            defaultValue: '400',
+            options: { options: FONT_WEIGHT_OPTIONS },
+            defaultValue: 400,
             bindable: true,
             responsive: true,
             states: true,
@@ -1227,15 +1230,8 @@ export default {
             label: { en: 'Day weight' },
             type: 'TextSelect',
             section: 'style',
-            options: {
-                options: [
-                    { value: '400', label: 'Regular' },
-                    { value: '500', label: 'Medium' },
-                    { value: '600', label: 'Semibold' },
-                    { value: '700', label: 'Bold' },
-                ],
-            },
-            defaultValue: '400',
+            options: { options: FONT_WEIGHT_OPTIONS },
+            defaultValue: 400,
             bindable: true,
             responsive: true,
             states: true,
@@ -1373,15 +1369,8 @@ export default {
             label: { en: 'Today weight' },
             type: 'TextSelect',
             section: 'style',
-            options: {
-                options: [
-                    { value: '400', label: 'Regular' },
-                    { value: '500', label: 'Medium' },
-                    { value: '600', label: 'Semibold' },
-                    { value: '700', label: 'Bold' },
-                ],
-            },
-            defaultValue: '500',
+            options: { options: FONT_WEIGHT_OPTIONS },
+            defaultValue: 500,
             bindable: true,
             responsive: true,
             states: true,

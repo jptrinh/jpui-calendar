@@ -316,9 +316,9 @@
         },
         {
             "name": "captionFontWeight",
-            "description": "Font weight of the month/year caption.",
-            "type": "string",
-            "defaultValue": "500"
+            "description": "Font weight of the month/year caption. One of 100, 200, 300, 400, 500, 600, 700, 800, 900, or null for the default.",
+            "type": "number",
+            "defaultValue": 500
         },
         {
             "name": "captionColor",
@@ -382,9 +382,9 @@
         },
         {
             "name": "weekdayFontWeight",
-            "description": "Font weight of the weekday header row.",
-            "type": "string",
-            "defaultValue": "400"
+            "description": "Font weight of the weekday header row. One of 100, 200, 300, 400, 500, 600, 700, 800, 900, or null for the default.",
+            "type": "number",
+            "defaultValue": 400
         },
         {
             "name": "weekdayColor",
@@ -400,9 +400,9 @@
         },
         {
             "name": "dayFontWeight",
-            "description": "Font weight of a day number.",
-            "type": "string",
-            "defaultValue": "400"
+            "description": "Font weight of a day number. One of 100, 200, 300, 400, 500, 600, 700, 800, 900, or null for the default.",
+            "type": "number",
+            "defaultValue": 400
         },
         {
             "name": "dayColor",
@@ -454,9 +454,9 @@
         },
         {
             "name": "todayFontWeight",
-            "description": "Font weight of today’s cell.",
-            "type": "string",
-            "defaultValue": "500"
+            "description": "Font weight of today’s cell. One of 100, 200, 300, 400, 500, 600, 700, 800, 900, or null for the default.",
+            "type": "number",
+            "defaultValue": 500
         },
         {
             "name": "rangeEndpointBgColor",
