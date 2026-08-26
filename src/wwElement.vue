@@ -5,6 +5,7 @@
             'is-disabled': isDisabled,
             'is-readonly': isReadonly,
             'is-editing': isEditing,
+            'is-fill': isFillWidth,
         }"
         :data-mode="resolvedMode"
         role="group"
@@ -91,7 +92,12 @@
                     </button>
                 </div>
 
-                <table class="jp-cal__grid" role="grid" :aria-label="month.caption">
+                <table
+                    class="jp-cal__grid"
+                    role="grid"
+                    :aria-label="month.caption"
+                    :style="{ '--jpc-columns': columnCount }"
+                >
                     <thead>
                         <tr class="jp-cal__weekdays">
                             <th v-if="showWeekNumber" scope="col" class="jp-cal__week-number-header">
@@ -240,6 +246,14 @@ export default {
             ['dropdown', 'dropdown-years'].includes(captionLayout.value)
         );
         const showWeekNumber = computed(() => !!props.content?.showWeekNumber);
+        // 'hug' (default) keeps the historical behaviour: the calendar is exactly its grid,
+        // 7 (or 8) × cell size. 'fill' hands the width back to the container — the columns
+        // then split whatever room there is and the day buttons stay square on their own
+        // `aspect-ratio`, with the min cell size acting as the floor before it overflows.
+        const isFillWidth = computed(() => props.content?.widthMode === 'fill');
+        // The grid's floor in fill mode has to know how many columns there actually are,
+        // and only the component knows whether the week-number column is showing.
+        const columnCount = computed(() => (showWeekNumber.value ? 8 : 7));
         const showNavigation = computed(() => !props.content?.hideNavigation);
 
         const minDate = computed(() => fromDateKey(props.content?.minDate));
@@ -924,6 +938,8 @@ context.local.data?.['calendar']?.['range']?.['dayCount']
             showYearDropdown,
             showWeekNumber,
             showNavigation,
+            isFillWidth,
+            columnCount,
             accessibleName,
 
             // flags
@@ -990,6 +1006,17 @@ context.local.data?.['calendar']?.['range']?.['dayCount']
     // than 7 × --jpc-cell-size the whole element overflows as one block, background
     // included, instead of coming apart.
     width: max-content;
+    // Fill mode gives the width back to the container. It goes through a variable
+    // rather than a plain `width: 100%` because of specificity: the style panel's own
+    // width compiles to a rule on this same element, and `.jp-cal.is-fill` (0,3,0 with
+    // the scope attribute) would outrank it and pin the calendar to the parent no
+    // matter what the panel said. The config feeds `style.width` into --jpc-width so
+    // the panel wins from inside our own rule instead of fighting it; unset, the
+    // fallback is `100%`, which is what "fill container" means in a block parent and
+    // also survives landing in a flex row, where `auto` would shrink-to-fit.
+    &.is-fill {
+        width: var(--jpc-width, 100%);
+    }
     // No background / padding / border / border-radius here: those belong to WeWeb's
     // element style panel, and declaring them from the component fought it.
     font-family: var(--jpc-font-family, inherit);
@@ -1042,6 +1069,14 @@ context.local.data?.['calendar']?.['range']?.['dayCount']
     flex-direction: column;
     // Never stretch and never squeeze: each month is exactly as wide as its grid.
     flex: 0 0 auto;
+
+    // In fill mode the months share the row instead. `min-width: 0` because a table
+    // child gives the flex item an intrinsic minimum that would otherwise stop it
+    // from shrinking below its natural grid width.
+    .jp-cal.is-fill & {
+        flex: 1 1 0;
+        min-width: 0;
+    }
 }
 
 /* ─── Caption & nav ─── */
@@ -1187,10 +1222,26 @@ context.local.data?.['calendar']?.['range']?.['dayCount']
     // Horizontal 0 keeps day cells touching, which is what makes the range track
     // continuous without shadcn's bridging pseudo-element.
     border-spacing: 0 var(--jpc-week-gap, 4px);
+
+    // Fill mode: the table takes the container's width and `table-layout: fixed`
+    // splits it into equal columns on its own, once the per-column widths below are
+    // dropped. The floor keeps cells from collapsing to nothing in a cramped parent —
+    // below it the grid overflows, which is the same failure mode as hug mode.
+    .jp-cal.is-fill & {
+        width: 100%;
+        min-width: calc(var(--jpc-columns, 7) * var(--jpc-cell-size, 32px));
+    }
 }
 
 .jp-cal__weekday {
     width: var(--jpc-cell-size, 32px);
+
+    // Left unset so `table-layout: fixed` distributes the width evenly instead of
+    // pinning every column to the cell size.
+    .jp-cal.is-fill & {
+        width: auto;
+    }
+
     padding: 0;
     font-size: var(--jpc-weekday-size, 0.8rem);
     font-weight: var(--jpc-weekday-weight, 400);
@@ -1203,6 +1254,10 @@ context.local.data?.['calendar']?.['range']?.['dayCount']
 .jp-cal__week-number {
     width: var(--jpc-cell-size, 32px);
     padding: 0;
+
+    .jp-cal.is-fill & {
+        width: auto;
+    }
 }
 
 .jp-cal__week-number-inner {
@@ -1224,6 +1279,10 @@ context.local.data?.['calendar']?.['range']?.['dayCount']
     padding: 0;
     text-align: center;
     position: relative;
+
+    .jp-cal.is-fill & {
+        width: auto;
+    }
 }
 
 .jp-cal__day-btn {

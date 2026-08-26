@@ -60,8 +60,14 @@ all understood on the way in. Writing is not — the value you bind against is a
 
 ## Sizing
 
+**Width mode** (style panel → Calendar) decides which way the sizing runs: *Hug cells*
+(the default) derives the calendar's width from the cell size, *Fill container* derives
+the cell size from the calendar's width. Cells hold a 1:1 aspect ratio either way.
+
+### Hug cells
+
 The calendar is `width: max-content` — it hugs its grid rather than stretching, so a day
-cell is exactly **Cell size** at any container width, and cells hold a 1:1 aspect ratio.
+cell is exactly **Cell size** at any container width.
 
 Its width is therefore always **7 × Cell size** (8 × with week numbers): 224 px at the
 default Cell size of 32, 336 px at 48. Two months side by side come to 464 px. Any padding
@@ -73,6 +79,25 @@ never compresses. In a container narrower than that width the whole element over
 one block, background included — it does not come apart. **Size the parent from the
 calendar, not the other way round:** give the container `fit-content` (Hug), or a fixed
 width of at least 7 × Cell size plus its own padding. Lower Cell size for narrow layouts.
+
+### Fill container
+
+The root goes to `width: var(--jpc-width, 100%)`, the grid to `width: 100%`, and the
+per-column widths are dropped so `table-layout: fixed` splits the available width into 7
+equal columns (8 with week numbers). A day cell is therefore **calendar width ÷ 7**, and
+the day button's `aspect-ratio: 1` keeps it square as it grows.
+
+Set the width on the element style panel as you would on any other element; it reaches the
+component as `--jpc-width` through the `css()` hook, so it wins over the component's own
+rule rather than losing a specificity fight with it. Leave it unset and the calendar takes
+100% of its parent.
+
+**Min cell size** replaces Cell size in this mode. It is a floor, not a target: cells grow
+past it freely, and below it the grid overflows rather than compressing further — the same
+failure mode as Hug. It also still sets the size of the nav buttons, which do not scale
+with the cells.
+
+### Why `max-content`
 
 `max-content` rather than `fit-content` is deliberate. `fit-content` clamps itself to the
 available space, which made the element's box narrower than the table inside it: the grid

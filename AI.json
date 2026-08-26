@@ -258,6 +258,12 @@
             }
         },
         {
+            "name": "widthMode",
+            "description": "How the calendar's width is decided. 'hug' (default): the calendar is exactly its grid — 7 × cellSize (8 × with week numbers) — and any width set on the element is ignored. 'fill': the calendar takes the width of its container and the 7 (or 8) columns divide it evenly, cells staying square, down to minCellSize.",
+            "type": "string",
+            "defaultValue": "hug"
+        },
+        {
             "name": "calendarFontFamily",
             "description": "Font family for every text in the calendar.",
             "type": "string",
@@ -274,9 +280,21 @@
         },
         {
             "name": "cellSize",
-            "description": "The exact square size of a day cell. Cells hold a 1:1 aspect ratio and do not grow with the container, so this also sets the calendar’s width: 7 × this value (8 × with week numbers), plus padding. Below that width the grid overflows rather than compressing.",
+            "description": "The exact square size of a day cell. Cells hold a 1:1 aspect ratio and do not grow with the container, so this also sets the calendar’s width: 7 × this value (8 × with week numbers), plus padding. Below that width the grid overflows rather than compressing. Only applies when widthMode is 'hug'.",
             "type": "string",
-            "defaultValue": "32px"
+            "defaultValue": "32px",
+            "inactiveProperty": {
+                "description": "Conditionally hidden — see the description."
+            }
+        },
+        {
+            "name": "minCellSize",
+            "description": "The smallest a day cell may get while widthMode is 'fill'. Cells grow past it freely as the container widens; below it the grid overflows rather than compressing further. Also sets the size of the nav buttons. Only applies when widthMode is 'fill'.",
+            "type": "string",
+            "defaultValue": "32px",
+            "inactiveProperty": {
+                "description": "Conditionally hidden — see the description."
+            }
         },
         {
             "name": "cellRadius",

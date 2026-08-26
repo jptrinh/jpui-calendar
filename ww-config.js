@@ -53,12 +53,12 @@ export default {
             {
                 label: 'Calendar',
                 isCollapsible: true,
-                properties: ['calendarFontFamily', 'monthGap'],
+                properties: ['widthMode', 'calendarFontFamily', 'monthGap'],
             },
             {
                 label: 'Cell',
                 isCollapsible: true,
-                properties: ['cellSize', 'cellRadius', 'weekGap'],
+                properties: ['cellSize', 'minCellSize', 'cellRadius', 'weekGap'],
             },
             {
                 label: 'Caption & nav',
@@ -140,16 +140,26 @@ export default {
      * `var(--jpc-x, <default>)`, so the component still looks right while serving
      * locally, before the compiler has run.
      */
-    css({ content }) {
+    css({ content, style }) {
         return [
             /* Calendar */
             // Background, padding, border and radius are deliberately absent: WeWeb's own
             // element style panel already owns those on the root, and declaring them here
             // put two competing sources on the same properties.
+            // Only consumed in fill mode, where the root reads `width: var(--jpc-width, 100%)`.
+            // Routing the panel's own width through a variable keeps it winning over the
+            // component's rule instead of losing a specificity fight with it.
+            { property: '--jpc-width', value: content.widthMode === 'fill' ? style?.width : undefined },
             { property: '--jpc-font-family', value: content.calendarFontFamily },
             { property: '--jpc-month-gap', value: content.monthGap },
             /* Cell */
-            { property: '--jpc-cell-size', value: content.cellSize },
+            // One variable, two meanings: the exact cell size when the calendar hugs its
+            // grid, the floor it refuses to shrink past when it fills its container. Only
+            // one of the two properties is visible at a time, so they never both apply.
+            {
+                property: '--jpc-cell-size',
+                value: content.widthMode === 'fill' ? content.minCellSize : content.cellSize,
+            },
             { property: '--jpc-cell-radius', value: content.cellRadius },
             { property: '--jpc-week-gap', value: content.weekGap },
             /* Caption & nav */
@@ -814,6 +824,32 @@ export default {
 
         /* ─── Calendar ─── */
 
+        widthMode: {
+            label: { en: 'Width mode' },
+            type: 'TextSelect',
+            section: 'style',
+            options: {
+                options: [
+                    { value: 'hug', label: 'Hug cells' },
+                    { value: 'fill', label: 'Fill container' },
+                ],
+            },
+            defaultValue: 'hug',
+            bindable: true,
+            responsive: true,
+            states: true,
+            /* wwEditor:start */
+            propertyHelp: {
+                tooltip:
+                    'Hug cells: the calendar is exactly its grid — 7 × the cell size (8 × with week numbers) — and any width set in the style panel is ignored. Fill container: the calendar takes the width you give it here and the cells divide it evenly, staying square.',
+            },
+            bindingValidation: {
+                type: 'string',
+                tooltip: "A width mode: `'hug'` or `'fill'`",
+            },
+            /* wwEditor:end */
+        },
+
         calendarFontFamily: {
             label: { en: 'Font family' },
             type: 'FontFamily',
@@ -862,10 +898,36 @@ export default {
             bindable: true,
             responsive: true,
             states: true,
+            hidden: content => content?.widthMode === 'fill',
             /* wwEditor:start */
             propertyHelp: {
                 tooltip:
-                    'The exact square size of a day cell. The calendar hugs its grid, so this also sets its width: 7 × this value (8 × with week numbers) plus padding. Below that the grid overflows instead of compressing — lower this value for narrow layouts.',
+                    'The exact square size of a day cell. The calendar hugs its grid, so this also sets its width: 7 × this value (8 × with week numbers) plus padding. Below that the grid overflows instead of compressing — lower this value, or switch Width mode to Fill container, for narrow layouts.',
+            },
+            /* wwEditor:end */
+        },
+
+        minCellSize: {
+            label: { en: 'Min cell size' },
+            type: 'Length',
+            section: 'style',
+            options: {
+                unitChoices: [
+                    { value: 'px', label: 'px', min: 16, max: 96 },
+                    { value: 'rem', label: 'rem', min: 1, max: 6 },
+                ],
+                noRange: true,
+                useVar: true,
+            },
+            defaultValue: '32px',
+            bindable: true,
+            responsive: true,
+            states: true,
+            hidden: content => content?.widthMode !== 'fill',
+            /* wwEditor:start */
+            propertyHelp: {
+                tooltip:
+                    'The smallest a day cell is allowed to get while the calendar fills its container. Cells grow past it freely; below it the grid overflows instead of compressing further. Also sets the size of the nav buttons.',
             },
             /* wwEditor:end */
         },
