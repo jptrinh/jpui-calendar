@@ -158,7 +158,7 @@
 
 <script>
 import { computed, inject, nextTick, onBeforeUnmount, ref, watch, watchEffect } from 'vue';
-import { addDays, addMonths, addYears, differenceInCalendarDays, isAfter, isBefore, startOfMonth } from 'date-fns';
+import { addDays, addMonths, addYears, isAfter, isBefore, startOfMonth } from 'date-fns';
 
 import {
     buildMonths,
@@ -170,7 +170,6 @@ import {
     getWeekdayNames,
     isRangeEmpty,
     normalizeValue,
-    orderRange,
     rangeDayCount,
     toDateKey,
 } from './dates';
@@ -372,29 +371,45 @@ export default {
         );
 
         /**
-         * While a range is half-open, `minRange` blocks the days that would close it
-         * too short. Greying them out beats silently swallowing the click — and
-         * Escape still cancels the pending start.
+         * `minRange` blocks the days that would make the range too short. Greying
+         * them out beats silently swallowing the click — and Escape still cancels a
+         * pending start. The endpoints themselves stay clickable: clicking one
+         * restarts the range rather than resizing it.
          */
         const gridDisabledKeys = computed(() => {
-            const pending = pendingStartKey.value;
-            if (!pending || minRange.value < 2) return disabledKeys.value;
+            const { start, end } = rangeValue.value;
+            if (!start || minRange.value < 2) return disabledKeys.value;
 
             const keys = new Set(disabledKeys.value);
-            const start = fromDateKey(pending);
-            for (let offset = 0; offset <= minRange.value - 2; offset += 1) {
-                keys.add(toDateKey(addDays(start, offset)));
+            const startDate = fromDateKey(start);
+            for (let offset = 1; offset <= minRange.value - 2; offset += 1) {
+                keys.add(toDateKey(addDays(startDate, offset)));
+                // A pending start can be closed backwards too, so block both sides.
+                if (!end) keys.add(toDateKey(addDays(startDate, -offset)));
             }
             return keys;
         });
 
-        /** `maxRange` clamps how far out the closing day can be, but only while pending. */
+        /**
+         * `maxRange` clamps how far the range can be stretched. Days after the start
+         * settle the end, so they hang off the start; days before it push the start
+         * back, so they hang off whichever edge stays put.
+         */
         const gridMaxDate = computed(() => {
-            const pending = pendingStartKey.value;
-            if (!pending || maxRange.value < 1) return maxDate.value;
+            const { start } = rangeValue.value;
+            if (!start || maxRange.value < 1) return maxDate.value;
 
-            const limit = addDays(fromDateKey(pending), maxRange.value - 1);
+            const limit = addDays(fromDateKey(start), maxRange.value - 1);
             return maxDate.value && isBefore(maxDate.value, limit) ? maxDate.value : limit;
+        });
+
+        const gridMinDate = computed(() => {
+            const { start, end } = rangeValue.value;
+            const anchor = end || start;
+            if (!anchor || maxRange.value < 1) return minDate.value;
+
+            const limit = addDays(fromDateKey(anchor), -(maxRange.value - 1));
+            return minDate.value && isAfter(minDate.value, limit) ? minDate.value : limit;
         });
 
         // ─── Displayed month ─────────────────────────────────────────────────────
@@ -463,7 +478,7 @@ export default {
                 mode: resolvedMode.value,
                 selectedKey: selectedKey.value,
                 range: rangeValue.value,
-                minDate: minDate.value,
+                minDate: gridMinDate.value,
                 maxDate: gridMaxDate.value,
                 disabledKeys: gridDisabledKeys.value,
                 disabledWeekdays: disabledWeekdays.value,
@@ -518,25 +533,50 @@ export default {
             commitValue(next);
         };
 
-        const selectRange = day => {
-            const { start, end } = rangeValue.value;
-
-            // No open range, or a complete one: this click starts a new range.
-            if (!start || end || day.key < start) {
-                commitValue({ start: day.key, end: null });
-                return;
-            }
-
-            const count = differenceInCalendarDays(fromDateKey(day.key), fromDateKey(start)) + 1;
-            if (minRange.value && count < minRange.value) return;
-            if (maxRange.value && count > maxRange.value) return;
-
-            const next = orderRange(start, day.key);
+        const commitRange = next => {
             commitValue(next);
+            if (!next.start || !next.end) return;
             emit('trigger-event', {
                 name: 'rangeComplete',
                 event: { value: next, dayCount: rangeDayCount(next) },
             });
+        };
+
+        const isRangeAllowed = range => {
+            const count = rangeDayCount(range);
+            if (minRange.value && count < minRange.value) return false;
+            if (maxRange.value && count > maxRange.value) return false;
+            return true;
+        };
+
+        /**
+         * A click never throws the whole range away: it moves the edge it is nearest
+         * to. Only the endpoints restart the selection — clicking one of a complete
+         * range keeps it as the new start, clicking a lone start clears it.
+         */
+        const selectRange = day => {
+            const { start, end } = rangeValue.value;
+
+            if (!start) {
+                commitRange({ start: day.key, end: null });
+                return;
+            }
+
+            if (day.key === start && !end) {
+                commitRange({ start: null, end: null });
+                return;
+            }
+
+            if (day.key === start || day.key === end) {
+                commitRange({ start: day.key, end: null });
+                return;
+            }
+
+            // Before the start pushes the start back; anything else — inside the
+            // range, or past its end — settles the end.
+            const next = day.key < start ? { start: day.key, end: end || start } : { start, end: day.key };
+            if (!isRangeAllowed(next)) return;
+            commitRange(next);
         };
 
         const handleDaySelect = day => {

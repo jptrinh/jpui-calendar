@@ -15,6 +15,7 @@
         ],
         "features": [
             "Single-date and date-range selection, stored as timezone-safe ISO date strings",
+            "Range editing that adjusts the nearest edge instead of restarting: a click before the start moves the start, any other click moves the end, and clicking an endpoint restarts from it",
             "Range mode that draws the middle band once both ends are picked, with a continuous track across week boundaries",
             "Min/max dates, individual blocked dates (hand-entered or mapped from a collection), and blocked weekdays",
             "Minimum and maximum range length, enforced by greying out the days that would violate it",
@@ -99,7 +100,7 @@
         },
         {
             "name": "minRange",
-            "description": "Minimum inclusive number of days in a range. While a start is pending, days that would close the range too short are greyed out. 0 = no minimum.",
+            "description": "Minimum inclusive number of days in a range. Days that would make the range too short are greyed out. 0 = no minimum.",
             "type": "number",
             "defaultValue": 0,
             "inactiveProperty": {
@@ -108,7 +109,7 @@
         },
         {
             "name": "maxRange",
-            "description": "Maximum inclusive number of days in a range. While a start is pending, days beyond the limit are greyed out. 0 = no maximum.",
+            "description": "Maximum inclusive number of days in a range. Days that would stretch the range past the limit are greyed out. 0 = no maximum.",
             "type": "number",
             "defaultValue": 0,
             "inactiveProperty": {

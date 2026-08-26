@@ -680,7 +680,7 @@ export default {
             /* wwEditor:start */
             bindingValidation: { type: 'number', tooltip: 'Maximum number of days in a range, inclusive. 0 = no maximum.' },
             propertyHelp: {
-                tooltip: 'Once a start date is picked, days beyond this many days out are greyed out until the range is closed.',
+                tooltip: 'Once a start date is picked, days that would stretch the range beyond this many days are greyed out.',
             },
             /* wwEditor:end */
         },

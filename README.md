@@ -13,7 +13,8 @@ part of it can be restyled without writing CSS.
 ## What it does
 
 - **Single-date and date-range selection.** Range mode draws the middle band only once both ends
-  are picked, with a continuous track across week boundaries.
+  are picked, with a continuous track across week boundaries, and adjusts an existing range rather
+  than restarting it on every click.
 - **Timezone-safe values.** The selection is stored as a date-only string, `"2026-08-14"`, never a
   `Date` or an ISO timestamp — those drift a day when read back in another timezone.
 - **Constraints.** Min/max dates, individual blocked dates (typed in or mapped from a bound
@@ -34,6 +35,25 @@ part of it can be restyled without writing CSS.
 |---|---|
 | `single` | `"2026-08-14"` or `null` |
 | `range` | `{ start: "2026-08-14", end: "2026-08-20" }` — `end` is `null` while the range is open |
+
+### Range interaction
+
+A click resizes the range from the edge it is nearest to, so a picked range can be corrected without
+clearing it first:
+
+| State | Click | Result |
+|---|---|---|
+| Nothing picked | any day | that day becomes the start, `end` stays `null` |
+| Start only | a later day | closes the range on that day |
+| Start only | an earlier day | that day becomes the start, the old start becomes the end |
+| Start only | the start itself | clears the selection |
+| Start and end | a day inside the range | moves the end to that day |
+| Start and end | a day after the end | moves the end to that day |
+| Start and end | a day before the start | moves the start to that day |
+| Start and end | either endpoint | that day becomes the start, `end` is cleared |
+
+Clicks that would break **Min / Max range length** are ignored, and the days they would land on are
+greyed out. Escape clears a start that has no end yet.
 
 Reading is tolerant: a `Date`, a timestamp, an ISO datetime, `{ from, to }` and `[start, end]` are
 all understood on the way in. Writing is not — the value you bind against is always the shape above.
