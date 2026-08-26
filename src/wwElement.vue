@@ -1281,11 +1281,13 @@ context.local.data?.['calendar']?.['range']?.['dayCount']
     position: relative;
     // The range track is painted here and the pill on the button, so the two layers only
     // stay in register while they animate on the same clock: same properties, same
-    // duration, same easing on both. `border-radius` is in the list because the track's
-    // corners change shape as often as its color does (an endpoint demoted to a middle
-    // day squares off, a middle day promoted to an endpoint rounds), and a shape that
-    // snaps under a color that fades is exactly what reads as broken.
-    transition: background-color 150ms ease, border-radius 150ms ease;
+    // duration, same easing on both.
+    //
+    // Color only. `border-radius` is deliberately absent from both lists: a cell's
+    // corners change shape every time the band's edge moves past them, and a corner
+    // morphing over 150ms reads as a glitch however well synchronised it is. Shape is
+    // instant everywhere in this grid; color is the only thing that fades.
+    transition: background-color 150ms ease;
 
     .jp-cal.is-fill & {
         width: auto;
@@ -1313,7 +1315,7 @@ context.local.data?.['calendar']?.['range']?.['dayCount']
     color: var(--jpc-day-color, #0A0A0A);
     cursor: pointer;
     user-select: none;
-    transition: background-color 150ms ease, color 150ms ease, border-radius 150ms ease;
+    transition: background-color 150ms ease, color 150ms ease;
 
     &:hover {
         background: var(--jpc-day-hover-bg, #F5F5F5);
@@ -1368,17 +1370,18 @@ context.local.data?.['calendar']?.['range']?.['dayCount']
     border-bottom-right-radius: var(--jpc-cell-radius, 6px);
 }
 
-// Exactly one change must not animate: a day entering the track. That day is always a
-// demoted endpoint — extending a range past its own edge keeps the old edge and swallows
-// it — so the pill would dissolve in place, a full-contrast crossfade on both background
-// and text under a corner squaring off at the same time. It reads as a smear.
+// One colour change must not animate either: a day entering the track. That day is always
+// a demoted endpoint — selectRange moves the nearest edge rather than rebuilding, so
+// extending a range past its own end keeps the old end and swallows it — and its pill
+// would dissolve in place, a full-contrast crossfade on background and text at once. It
+// smears, and no easing fixes that; the pill has to be gone the moment it stops being an
+// endpoint.
 //
 // `transition: none` here is what makes the snap one-directional. CSS resolves a
 // transition from the after-change style, so becoming a middle day snaps, while leaving
 // the state — promoted back to a pill, or dropped off the track entirely — still reads
-// its transition from the rules above and fades. The cell is deliberately left out of
-// this: the track keeps fading, so the band still grows and shrinks smoothly. Only the
-// pill on top of it is cut.
+// its transition from the rules above and fades. The cell is deliberately left out: the
+// track keeps fading, so the band grows and shrinks smoothly. Only the pill is cut.
 .jp-cal__day[data-range-middle] .jp-cal__day-btn {
     background: transparent;
     color: var(--jpc-range-track-color, #0A0A0A);
@@ -1391,7 +1394,7 @@ context.local.data?.['calendar']?.['range']?.['dayCount']
         background: var(--jpc-day-hover-bg, #F5F5F5);
         color: var(--jpc-day-hover-color, #0A0A0A);
         border-radius: var(--jpc-cell-radius, 6px);
-        transition: background-color 150ms ease, color 150ms ease, border-radius 150ms ease;
+        transition: background-color 150ms ease, color 150ms ease;
     }
 }
 
