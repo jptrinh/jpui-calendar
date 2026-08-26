@@ -424,13 +424,13 @@
         },
         {
             "name": "selectedBgColor",
-            "description": "Background of the selected day in single mode.",
+            "description": "Background of the selected day — and of the range start and end pills in range mode.",
             "type": "string",
             "defaultValue": "#171717"
         },
         {
             "name": "selectedColor",
-            "description": "Text color of the selected day in single mode.",
+            "description": "Text color of the selected day — and of the range start and end pills in range mode.",
             "type": "string",
             "defaultValue": "#FAFAFA"
         },
@@ -457,24 +457,6 @@
             "description": "Font weight of today’s cell. One of 100, 200, 300, 400, 500, 600, 700, 800, 900, or null for the default.",
             "type": "number",
             "defaultValue": 500
-        },
-        {
-            "name": "rangeEndpointBgColor",
-            "description": "Background of the range start and end pills.",
-            "type": "string",
-            "defaultValue": "#171717",
-            "inactiveProperty": {
-                "description": "Conditionally hidden — see the description."
-            }
-        },
-        {
-            "name": "rangeEndpointColor",
-            "description": "Text color of the range start and end pills.",
-            "type": "string",
-            "defaultValue": "#FAFAFA",
-            "inactiveProperty": {
-                "description": "Conditionally hidden — see the description."
-            }
         },
         {
             "name": "rangeMiddleBgColor",

@@ -1323,7 +1323,7 @@ context.local.data?.['calendar']?.['range']?.['dayCount']
 }
 
 /* ─── Day states ─── */
-/* Order matters: today → selected → range track → range endpoints → outside/disabled. */
+/* Order matters: today → selected → range track → outside/disabled. */
 
 .jp-cal__day[data-today] .jp-cal__day-btn {
     background: var(--jpc-today-bg, #F5F5F5);
@@ -1331,6 +1331,9 @@ context.local.data?.['calendar']?.['range']?.['dayCount']
     font-weight: var(--jpc-today-weight, 500);
 }
 
+// Range endpoints are selected days too (`isSelected` covers start, middle and end), so
+// this one rule paints the dark pill in both modes. The track rules below only have to
+// undo it for the middle days.
 .jp-cal__day[data-selected] .jp-cal__day-btn {
     background: var(--jpc-selected-bg, #171717);
     color: var(--jpc-selected-color, #FAFAFA);
@@ -1368,17 +1371,6 @@ context.local.data?.['calendar']?.['range']?.['dayCount']
         background: var(--jpc-day-hover-bg, #F5F5F5);
         color: var(--jpc-day-hover-color, #0A0A0A);
         border-radius: var(--jpc-cell-radius, 6px);
-    }
-}
-
-.jp-cal__day[data-range-start] .jp-cal__day-btn,
-.jp-cal__day[data-range-end] .jp-cal__day-btn {
-    background: var(--jpc-range-endpoint-bg, #171717);
-    color: var(--jpc-range-endpoint-color, #FAFAFA);
-
-    &:hover {
-        background: var(--jpc-range-endpoint-bg, #171717);
-        color: var(--jpc-range-endpoint-color, #FAFAFA);
     }
 }
 

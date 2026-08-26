@@ -146,6 +146,10 @@ grid looks → language and formatting → state, accessibility, form. It mirror
 **Calendar** · **Cell** · **Caption & nav** · **Weekday header** · **Day** · **Selected** ·
 **Today** · **Range** · **Outside & disabled** · **Week number** · **Focus-visible** · **Invalid**
 
+The **Selected** group paints the dark pill in both modes — in range mode the start and end
+days are selected days too, so they read the same three properties. **Range** is therefore
+only about the track between them.
+
 The **Calendar** group is deliberately thin — just Font family and Month gap. Background,
 padding, border and border-radius belong to WeWeb's own element style panel on the root;
 declaring them from the component too put two competing sources on the same properties.

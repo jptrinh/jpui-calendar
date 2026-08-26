@@ -117,7 +117,7 @@ export default {
             {
                 label: 'Range',
                 isCollapsible: true,
-                properties: ['rangeEndpointBgColor', 'rangeEndpointColor', 'rangeMiddleBgColor', 'rangeMiddleColor'],
+                properties: ['rangeMiddleBgColor', 'rangeMiddleColor'],
             },
             {
                 label: 'Outside & disabled',
@@ -208,8 +208,6 @@ export default {
             { property: '--jpc-today-color', value: content.todayColor },
             { property: '--jpc-today-weight', value: content.todayFontWeight },
             /* Range */
-            { property: '--jpc-range-endpoint-bg', value: content.rangeEndpointBgColor },
-            { property: '--jpc-range-endpoint-color', value: content.rangeEndpointColor },
             { property: '--jpc-range-track-bg', value: content.rangeMiddleBgColor },
             { property: '--jpc-range-track-color', value: content.rangeMiddleColor },
             /* Outside & disabled */
@@ -1377,38 +1375,6 @@ export default {
         },
 
         /* ─── Range ─── */
-
-        rangeEndpointBgColor: {
-            label: { en: 'Range endpoint background' },
-            type: 'Color',
-            section: 'style',
-            options: { nullable: true },
-            defaultValue: '#171717',
-            bindable: true,
-            responsive: true,
-            states: true,
-            classes: true,
-            hidden: content => content?.mode !== 'range',
-            /* wwEditor:start */
-            bindingValidation: { cssSupports: 'color', type: 'string', tooltip: 'A color: `"#171717"`' },
-            /* wwEditor:end */
-        },
-
-        rangeEndpointColor: {
-            label: { en: 'Range endpoint color' },
-            type: 'Color',
-            section: 'style',
-            options: { nullable: true },
-            defaultValue: '#FAFAFA',
-            bindable: true,
-            responsive: true,
-            states: true,
-            classes: true,
-            hidden: content => content?.mode !== 'range',
-            /* wwEditor:start */
-            bindingValidation: { cssSupports: 'color', type: 'string', tooltip: 'A color: `"#FAFAFA"`' },
-            /* wwEditor:end */
-        },
 
         rangeMiddleBgColor: {
             label: { en: 'Range track background' },
