@@ -15,7 +15,6 @@
         :data-ww-disabled="isDisabled ? 'true' : null"
         @focusin="handleFocusIn"
         @focusout="handleFocusOut"
-        @mouseleave="hoveredKey = null"
     >
         <div class="jp-cal__months" :class="{ 'is-column': resolvedMonthDirection === 'column' }">
             <!--
@@ -143,7 +142,6 @@
                                     :aria-current="day.isToday ? 'date' : undefined"
                                     @click="handleDaySelect(day)"
                                     @keydown="handleKeydown(day, $event)"
-                                    @mouseenter="handleDayHover(day)"
                                     @focus="focusedKey = day.key"
                                 >
                                     {{ day.dayOfMonth }}
@@ -451,8 +449,6 @@ export default {
 
         // ─── Grid ────────────────────────────────────────────────────────────────
 
-        const hoveredKey = ref(null);
-
         const months = computed(() =>
             buildMonths({
                 displayedMonth: displayedMonth.value,
@@ -466,7 +462,6 @@ export default {
                 mode: resolvedMode.value,
                 selectedKey: selectedKey.value,
                 range: rangeValue.value,
-                previewEndKey: hoveredKey.value,
                 minDate: minDate.value,
                 maxDate: gridMaxDate.value,
                 disabledKeys: gridDisabledKeys.value,
@@ -554,14 +549,8 @@ export default {
             else selectSingle(day);
         };
 
-        const handleDayHover = day => {
-            if (resolvedMode.value !== 'range' || !pendingStartKey.value) return;
-            hoveredKey.value = day.isDisabled ? null : day.key;
-        };
-
         const cancelPendingRange = () => {
             if (!pendingStartKey.value) return false;
-            hoveredKey.value = null;
             commitValue({ start: null, end: null });
             return true;
         };
@@ -883,7 +872,6 @@ context.local.data?.['calendar']?.['range']?.['dayCount']
             weekdayLongNames,
             monthNames,
             yearOptions,
-            hoveredKey,
             focusedKey,
             activeCellKey,
 
@@ -920,7 +908,6 @@ context.local.data?.['calendar']?.['range']?.['dayCount']
             // handlers
             registerDayButton,
             handleDaySelect,
-            handleDayHover,
             handleKeydown,
             handleFocusIn,
             handleFocusOut,

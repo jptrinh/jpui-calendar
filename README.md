@@ -12,8 +12,8 @@ part of it can be restyled without writing CSS.
 
 ## What it does
 
-- **Single-date and date-range selection.** Range mode previews the middle band under the cursor
-  and draws a continuous track across week boundaries.
+- **Single-date and date-range selection.** Range mode draws the middle band only once both ends
+  are picked, with a continuous track across week boundaries.
 - **Timezone-safe values.** The selection is stored as a date-only string, `"2026-08-14"`, never a
   `Date` or an ISO timestamp — those drift a day when read back in another timezone.
 - **Constraints.** Min/max dates, individual blocked dates (typed in or mapped from a bound

@@ -15,7 +15,7 @@
         ],
         "features": [
             "Single-date and date-range selection, stored as timezone-safe ISO date strings",
-            "Range mode with a live hover preview of the middle band and a continuous track across week boundaries",
+            "Range mode that draws the middle band once both ends are picked, with a continuous track across week boundaries",
             "Min/max dates, individual blocked dates (hand-entered or mapped from a collection), and blocked weekdays",
             "Minimum and maximum range length, enforced by greying out the days that would violate it",
             "Full keyboard support: arrows, Home/End, PageUp/PageDown, Shift+PageUp/Down for years, Enter to select, Escape to cancel a pending range",

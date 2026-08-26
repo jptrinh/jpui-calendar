@@ -233,9 +233,9 @@ export function formatValue(dateKey, { style = 'medium', pattern = 'yyyy-MM-dd',
 /**
  * Build the month matrices rendered by the template.
  *
- * This is the component's hot path — it re-runs on every hover in range mode —
- * so all the set membership it needs (`disabledKeys`, `disabledWeekdays`) is
- * passed in pre-built rather than recomputed per day.
+ * This is the component's hot path — it re-runs on every selection and month
+ * change — so all the set membership it needs (`disabledKeys`,
+ * `disabledWeekdays`) is passed in pre-built rather than recomputed per day.
  *
  * @returns {Array<{key, date, caption, weeks: Array<{key, weekNumber, days: Array}>}>}
  */
@@ -251,7 +251,6 @@ export function buildMonths({
     mode = 'single',
     selectedKey = null,
     range = null,
-    previewEndKey = null,
     minDate = null,
     maxDate = null,
     disabledKeys = null,
@@ -261,13 +260,6 @@ export function buildMonths({
     const anchor = startOfMonth(displayedMonth ?? new Date());
     const todayKey = toDateKey(today);
     const weekOptions = { weekStartsOn: Number(weekStartsOn) || 0 };
-
-    // While a range is half-open, the hovered day acts as a provisional end so
-    // the middle band previews under the cursor.
-    const effectiveRange =
-        mode === 'range' && range?.start && !range.end && previewEndKey && previewEndKey >= range.start
-            ? { start: range.start, end: previewEndKey }
-            : range;
 
     const months = [];
     const monthCount = Math.max(1, Math.min(12, Number(numberOfMonths) || 1));
@@ -306,7 +298,7 @@ export function buildMonths({
                         locale,
                         mode,
                         selectedKey,
-                        range: effectiveRange,
+                        range,
                         showOutsideDays,
                         minDate,
                         maxDate,
