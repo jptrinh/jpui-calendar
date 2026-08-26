@@ -107,7 +107,7 @@ export default {
             {
                 label: 'Selected',
                 isCollapsible: true,
-                properties: ['selectedBgColor', 'selectedColor', 'selectedHoverBgColor'],
+                properties: ['selectedBgColor', 'selectedColor'],
             },
             {
                 label: 'Today',
@@ -202,7 +202,6 @@ export default {
             /* Selected */
             { property: '--jpc-selected-bg', value: content.selectedBgColor },
             { property: '--jpc-selected-color', value: content.selectedColor },
-            { property: '--jpc-selected-hover-bg', value: content.selectedHoverBgColor },
             /* Today */
             { property: '--jpc-today-bg', value: content.todayBgColor },
             { property: '--jpc-today-color', value: content.todayColor },
@@ -1313,21 +1312,6 @@ export default {
             classes: true,
             /* wwEditor:start */
             bindingValidation: { cssSupports: 'color', type: 'string', tooltip: 'A color: `"#FAFAFA"`' },
-            /* wwEditor:end */
-        },
-
-        selectedHoverBgColor: {
-            label: { en: 'Selected hover background' },
-            type: 'Color',
-            section: 'style',
-            options: { nullable: true },
-            defaultValue: '#171717',
-            bindable: true,
-            responsive: true,
-            states: true,
-            classes: true,
-            /* wwEditor:start */
-            bindingValidation: { cssSupports: 'color', type: 'string', tooltip: 'A color: `"#171717"`' },
             /* wwEditor:end */
         },
 

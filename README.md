@@ -147,7 +147,7 @@ grid looks → language and formatting → state, accessibility, form. It mirror
 **Today** · **Range** · **Outside & disabled** · **Week number** · **Focus-visible** · **Invalid**
 
 The **Selected** group paints the dark pill in both modes — in range mode the start and end
-days are selected days too, so they read the same three properties. **Range** is therefore
+days are selected days too, so they read the same two properties. **Range** is therefore
 only about the track between them.
 
 The **Calendar** group is deliberately thin — just Font family and Month gap. Background,

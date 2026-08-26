@@ -435,12 +435,6 @@
             "defaultValue": "#FAFAFA"
         },
         {
-            "name": "selectedHoverBgColor",
-            "description": "Background of the selected day on hover.",
-            "type": "string",
-            "defaultValue": "#171717"
-        },
-        {
             "name": "todayBgColor",
             "description": "Background of today’s cell.",
             "type": "string",

@@ -1334,14 +1334,14 @@ context.local.data?.['calendar']?.['range']?.['dayCount']
 // Range endpoints are selected days too (`isSelected` covers start, middle and end), so
 // this one rule paints the dark pill in both modes. The track rules below only have to
 // undo it for the middle days.
+// No `:hover` here. This selector already outranks the generic `.jp-cal__day-btn:hover`
+// (0,4,0 against 0,3,0 once the scope attribute is counted), so a selected day keeps its
+// pill on hover without a rule saying so. The hover it used to carry only ever restated
+// the same two colors, and the fade into it desynchronised from the cell in range mode,
+// where the transition is off.
 .jp-cal__day[data-selected] .jp-cal__day-btn {
     background: var(--jpc-selected-bg, #171717);
     color: var(--jpc-selected-color, #FAFAFA);
-
-    &:hover {
-        background: var(--jpc-selected-hover-bg, #171717);
-        color: var(--jpc-selected-color, #FAFAFA);
-    }
 }
 
 // The track lives on the cell, the pill on the button — two layers, exactly like
