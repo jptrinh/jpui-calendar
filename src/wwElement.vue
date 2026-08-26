@@ -1323,6 +1323,15 @@ context.local.data?.['calendar']?.['range']?.['dayCount']
     }
 }
 
+// Range mode paints in two layers and only the button can transition, so a fade always
+// desynchronises them: an endpoint turning into a track day would dissolve its dark pill
+// over corners the cell has already squared off, and a dropped endpoint would linger as a
+// floating pill after its track is gone — both read as a botched radius animation. Every
+// day cell snaps here; the fade is hover feedback only, and single mode keeps it.
+.jp-cal[data-mode='range'] .jp-cal__day-btn {
+    transition: none;
+}
+
 // A range that wraps to the next line still reads as one band: round it off at the
 // row edges. Declared after the range rules so it wins over `border-radius: 0`.
 .jp-cal__day.is-row-start {
