@@ -1279,6 +1279,13 @@ context.local.data?.['calendar']?.['range']?.['dayCount']
     padding: 0;
     text-align: center;
     position: relative;
+    // The range track is painted here and the pill on the button, so the two layers only
+    // stay in register while they animate on the same clock: same properties, same
+    // duration, same easing on both. `border-radius` is in the list because the track's
+    // corners change shape as often as its color does (an endpoint demoted to a middle
+    // day squares off, a middle day promoted to an endpoint rounds), and a shape that
+    // snaps under a color that fades is exactly what reads as broken.
+    transition: background-color 150ms ease, border-radius 150ms ease;
 
     .jp-cal.is-fill & {
         width: auto;
@@ -1306,7 +1313,7 @@ context.local.data?.['calendar']?.['range']?.['dayCount']
     color: var(--jpc-day-color, #0A0A0A);
     cursor: pointer;
     user-select: none;
-    transition: background-color 150ms ease, color 150ms ease;
+    transition: background-color 150ms ease, color 150ms ease, border-radius 150ms ease;
 
     &:hover {
         background: var(--jpc-day-hover-bg, #F5F5F5);
@@ -1337,8 +1344,7 @@ context.local.data?.['calendar']?.['range']?.['dayCount']
 // No `:hover` here. This selector already outranks the generic `.jp-cal__day-btn:hover`
 // (0,4,0 against 0,3,0 once the scope attribute is counted), so a selected day keeps its
 // pill on hover without a rule saying so. The hover it used to carry only ever restated
-// the same two colors, and the fade into it desynchronised from the cell in range mode,
-// where the transition is off.
+// the same two colors, and the fade into it desynchronised from the cell underneath.
 .jp-cal__day[data-selected] .jp-cal__day-btn {
     background: var(--jpc-selected-bg, #171717);
     color: var(--jpc-selected-color, #FAFAFA);
@@ -1362,25 +1368,31 @@ context.local.data?.['calendar']?.['range']?.['dayCount']
     border-bottom-right-radius: var(--jpc-cell-radius, 6px);
 }
 
+// Exactly one change must not animate: a day entering the track. That day is always a
+// demoted endpoint — extending a range past its own edge keeps the old edge and swallows
+// it — so the pill would dissolve in place, a full-contrast crossfade on both background
+// and text under a corner squaring off at the same time. It reads as a smear.
+//
+// `transition: none` here is what makes the snap one-directional. CSS resolves a
+// transition from the after-change style, so becoming a middle day snaps, while leaving
+// the state — promoted back to a pill, or dropped off the track entirely — still reads
+// its transition from the rules above and fades. The cell is deliberately left out of
+// this: the track keeps fading, so the band still grows and shrinks smoothly. Only the
+// pill on top of it is cut.
 .jp-cal__day[data-range-middle] .jp-cal__day-btn {
     background: transparent;
     color: var(--jpc-range-track-color, #0A0A0A);
     border-radius: 0;
+    transition: none;
 
+    // Restated so a hover themed away from the track color still fades in. Its fade out
+    // is the snap above, which is the same asymmetry and invisible at hover contrast.
     &:hover {
         background: var(--jpc-day-hover-bg, #F5F5F5);
         color: var(--jpc-day-hover-color, #0A0A0A);
         border-radius: var(--jpc-cell-radius, 6px);
+        transition: background-color 150ms ease, color 150ms ease, border-radius 150ms ease;
     }
-}
-
-// Range mode paints in two layers and only the button can transition, so a fade always
-// desynchronises them: an endpoint turning into a track day would dissolve its dark pill
-// over corners the cell has already squared off, and a dropped endpoint would linger as a
-// floating pill after its track is gone — both read as a botched radius animation. Every
-// day cell snaps here; the fade is hover feedback only, and single mode keeps it.
-.jp-cal[data-mode='range'] .jp-cal__day-btn {
-    transition: none;
 }
 
 // A range that wraps to the next line still reads as one band: round it off at the
@@ -1430,6 +1442,7 @@ context.local.data?.['calendar']?.['range']?.['dayCount']
 /* wwEditor:end */
 
 @media (prefers-reduced-motion: reduce) {
+    .jp-cal__day,
     .jp-cal__day-btn,
     .jp-cal__nav {
         transition: none;
