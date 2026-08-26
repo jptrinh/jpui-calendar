@@ -1,6 +1,6 @@
 {
     "name": "jpui-calendar",
-    "version": "0.1.5",
+    "version": "0.1.6",
     "description": "A shadcn-styled inline calendar for WeWeb: single-date and range selection with a fully editable style panel.",
     "scripts": {
         "build": "weweb build",
