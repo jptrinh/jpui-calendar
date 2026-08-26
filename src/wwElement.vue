@@ -127,6 +127,7 @@
                                 :data-range-start="day.isRangeStart || undefined"
                                 :data-range-middle="day.isRangeMiddle || undefined"
                                 :data-range-end="day.isRangeEnd || undefined"
+                                :data-range-open="day.isRangeOpen || undefined"
                                 role="gridcell"
                                 :aria-selected="day.isSelected ? 'true' : undefined"
                             >
@@ -1243,18 +1244,18 @@ context.local.data?.['calendar']?.['range']?.['dayCount']
 
 // The track lives on the cell, the pill on the button — two layers, exactly like
 // the shadcn original, minus the pseudo-element.
-.jp-cal__day[data-range-start],
+.jp-cal__day[data-range-start]:not([data-range-open]),
 .jp-cal__day[data-range-middle],
-.jp-cal__day[data-range-end] {
+.jp-cal__day[data-range-end]:not([data-range-open]) {
     background: var(--jpc-range-track-bg, #F5F5F5);
 }
 
-.jp-cal__day[data-range-start] {
+.jp-cal__day[data-range-start]:not([data-range-open]) {
     border-top-left-radius: var(--jpc-cell-radius, 6px);
     border-bottom-left-radius: var(--jpc-cell-radius, 6px);
 }
 
-.jp-cal__day[data-range-end] {
+.jp-cal__day[data-range-end]:not([data-range-open]) {
     border-top-right-radius: var(--jpc-cell-radius, 6px);
     border-bottom-right-radius: var(--jpc-cell-radius, 6px);
 }

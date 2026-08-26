@@ -353,6 +353,7 @@ function describeDay(
     let isRangeStart = false;
     let isRangeMiddle = false;
     let isRangeEnd = false;
+    let isRangeOpen = false;
 
     if (mode === 'range') {
         const { start, end } = range ?? {};
@@ -360,6 +361,9 @@ function describeDay(
         isRangeEnd = !!end && key === end;
         isRangeMiddle = !!start && !!end && key > start && key < end;
         isSelected = isRangeStart || isRangeEnd || isRangeMiddle;
+        // A lone endpoint has nothing to connect to yet, so it must not paint the
+        // track: the cell's square outer corners would show around the pill.
+        isRangeOpen = (isRangeStart || isRangeEnd) && !(start && end);
     } else {
         isSelected = !!selectedKey && key === selectedKey;
     }
@@ -378,6 +382,7 @@ function describeDay(
         isRangeStart,
         isRangeMiddle,
         isRangeEnd,
+        isRangeOpen,
         isDisabled,
     };
 }
