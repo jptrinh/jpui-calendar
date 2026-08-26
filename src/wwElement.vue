@@ -1283,11 +1283,16 @@ context.local.data?.['calendar']?.['range']?.['dayCount']
     // stay in register while they animate on the same clock: same properties, same
     // duration, same easing on both.
     //
-    // Color only. `border-radius` is deliberately absent from both lists: a cell's
-    // corners change shape every time the band's edge moves past them, and a corner
-    // morphing over 150ms reads as a glitch however well synchronised it is. Shape is
-    // instant everywhere in this grid; color is the only thing that fades.
-    transition: background-color 150ms ease;
+    // The corner never morphs — `border-radius` is transitioned at `0s`, so it jumps.
+    // What the delay buys is *when* it jumps: the rule is that a cell's shape may only
+    // change while the track is invisible or unchanged. On the way in that is free, the
+    // track fades up from transparent, so the track rule below overrides this delay to
+    // zero. On the way out it is not: the track is still fully painted, and squaring the
+    // corner immediately leaves a square block dissolving where a rounded end should be.
+    // Holding the old radius for exactly one fade keeps the band's ends rounded until
+    // there is nothing left to see, then snaps.
+    --track-fade: 150ms;
+    transition: background-color var(--track-fade) ease, border-radius 0s linear var(--track-fade);
 
     .jp-cal.is-fill & {
         width: auto;
@@ -1358,6 +1363,11 @@ context.local.data?.['calendar']?.['range']?.['dayCount']
 .jp-cal__day[data-range-middle],
 .jp-cal__day[data-range-end]:not([data-range-open]) {
     background: var(--jpc-range-track-bg, #F5F5F5);
+    // Becoming a track day, so the corner is either fading up from transparent or the
+    // track is staying put underneath it. Nothing to hide: drop the hold and snap now.
+    // An open start is excluded on purpose — it carries no track, so it leaves by the
+    // rule above and keeps its shape on the way out like any other exit.
+    transition: background-color var(--track-fade) ease, border-radius 0s;
 }
 
 .jp-cal__day[data-range-start]:not([data-range-open]) {
@@ -1445,7 +1455,13 @@ context.local.data?.['calendar']?.['range']?.['dayCount']
 /* wwEditor:end */
 
 @media (prefers-reduced-motion: reduce) {
-    .jp-cal__day,
+    // Zeroing the knob is what silences the cell: the track rule sets its own transition
+    // at a higher specificity than this block can reach, but it reads the duration from
+    // the same variable, so both the fade and the radius hold collapse to nothing.
+    .jp-cal__day {
+        --track-fade: 0s;
+    }
+
     .jp-cal__day-btn,
     .jp-cal__nav {
         transition: none;
