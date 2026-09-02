@@ -781,14 +781,28 @@ export default {
 
         const { getIcon } = wwLib.useIcons();
 
+        // `getIcon` resolves to whatever the server answered, not to null, when the
+        // icon is missing — so the usual `(await getIcon(x)) || DEFAULT` is only safe
+        // on a host that 404s. Self-hosted behind an SPA fallback, an unset icon asks
+        // for `/icons/null.svg`, gets `index.html` back with a 200, and that 50 kB of
+        // truthy HTML went straight into `v-html`: the whole app re-mounted inside the
+        // nav button. Guard the empty code, and require the answer to look like an SVG.
+        const loadIcon = async (code, fallback) => {
+            if (!code) return fallback;
+            const html = await getIcon(code);
+            return /^\s*<svg[\s>]/i.test(html ?? '') ? html : fallback;
+        };
+
         const previousIconHtml = ref(DEFAULT_CHEVRON_LEFT);
         const nextIconHtml = ref(DEFAULT_CHEVRON_RIGHT);
 
+        // The prop is read synchronously as the call argument, before `loadIcon`
+        // awaits, so watchEffect still tracks it.
         watchEffect(async () => {
-            previousIconHtml.value = (await getIcon(props.content?.navIconPrev)) || DEFAULT_CHEVRON_LEFT;
+            previousIconHtml.value = await loadIcon(props.content?.navIconPrev, DEFAULT_CHEVRON_LEFT);
         });
         watchEffect(async () => {
-            nextIconHtml.value = (await getIcon(props.content?.navIconNext)) || DEFAULT_CHEVRON_RIGHT;
+            nextIconHtml.value = await loadIcon(props.content?.navIconNext, DEFAULT_CHEVRON_RIGHT);
         });
 
         // ─── Form integration ────────────────────────────────────────────────────
